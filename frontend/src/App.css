@@ -1755,6 +1755,12 @@ footer {
     cursor: grabbing;
 }
 
+@media (max-width: 768px) {
+    .whatsapp-float-btn {
+        bottom: 90px;
+    }
+}
+
 @media (max-width: 1200px) {
     .products-grid {
         grid-template-columns: repeat(4, 1fr);
@@ -2182,6 +2188,8 @@ footer {
     }
 
     .partners-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
         gap: 1vh;
     }
 
@@ -2387,5 +2395,18 @@ footer {
         grid-column: 1 / -1;
         text-align: center;
         justify-content: center;
+    }
+
+    .partners-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .partner-card {
+        min-width: 0;
+        padding: 10px;
+        flex: 0 0 calc(50% - 5px);
     }
 }
