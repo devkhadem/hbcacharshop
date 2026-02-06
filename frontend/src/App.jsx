@@ -1083,14 +1083,16 @@ function App() {
                                                 <div>
                                                     <span className="price">{formatPrice(product.price)}</span>
                                                 </div>
-                                                <div className="product-actions">
+                                                <div className="product-top-actions">
                                                     <button className="add-btn" onClick={() => openQuantityModal(product)} title={t('add_to_cart')}>
                                                         <i className="fas fa-cart-plus"></i>
                                                     </button>
-                                                    <button className="buy-now-btn" onClick={() => { addToCart(product); setIsCartOpen(true); setIsCheckoutOpen(true); }}>{t('buy_now')}</button>
                                                     <button className="whatsapp-btn-card" onClick={() => handleWhatsAppInquiry(product)} title={lang === 'bn' ? "হোয়াটসঅ্যাপে অর্ডার করুন" : "Order on WhatsApp"}>
                                                         <i className="fab fa-whatsapp"></i>
                                                     </button>
+                                                </div>
+                                                <div className="product-actions">
+                                                    <button className="buy-now-btn" onClick={() => { addToCart(product); setIsCartOpen(true); setIsCheckoutOpen(true); }}>{t('buy_now')}</button>
                                                 </div>
                                             </div>
                                         </div>
