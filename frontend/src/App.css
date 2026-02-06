@@ -1774,6 +1774,10 @@ footer {
         padding-bottom: 70px;
     }
 
+    .product-top-actions {
+        margin-bottom: 5px !important;
+    }
+
     .overlay {
         display: block;
         position: fixed;
