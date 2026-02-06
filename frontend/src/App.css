@@ -1916,8 +1916,9 @@ footer {
     .footer-grid {
         display: grid;
         grid-template-columns: 1fr !important;
-        gap: 15px;
+        gap: 10px;
         justify-items: center;
+        padding: 0;
     }
 
     .service-features {
@@ -1952,7 +1953,6 @@ footer {
 
     .product-card {
         width: 100%;
-        max-width: 280px;
         margin-top: 10px;
     }
 
