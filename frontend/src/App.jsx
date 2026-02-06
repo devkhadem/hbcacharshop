@@ -987,8 +987,8 @@ function App() {
                                     }}>
                                         {lang === 'bn' ? 'ফ্ল্যাশ সেল' : 'FLASH SALE'}
                                     </div>
-                                    <div className="product-img">
-                                        <img src={product.image} alt={product.name[lang]} />
+                                    <div className="product-img" style={{ aspectRatio: '1 / 1', width: '100%' }}>
+                                        <img src={product.image} alt={product.name[lang]} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                     </div>
                                     <div className="product-info" style={{ textAlign: 'center' }}>
                                         <div className="product-footer" style={{ flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
@@ -1074,16 +1074,14 @@ function App() {
                             <div className="products-grid">
                                 {filteredProducts.map(product => (
                                     <div className="product-card" key={product.id} style={{ position: 'relative' }}>
-                                        <div className="product-img">
-                                            <img src={product.image} alt={product.name[lang]} />
+                                        <div className="product-img" style={{ aspectRatio: '1 / 1', width: '100%' }}>
+                                            <img src={product.image} alt={product.name[lang]} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                         </div>
                                         <div className="product-info" style={{ textAlign: 'center' }}>
                                             <h3 className="product-title">{product.name[lang]}</h3>
-                                            <div className="product-footer" style={{ flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
-                                                <div>
+                                            <div className="product-footer" style={{ flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%' }}>
                                                     <span className="price">{formatPrice(product.price)}</span>
-                                                </div>
-                                                <div className="product-top-actions">
                                                     <button className="add-btn" onClick={() => openQuantityModal(product)} title={t('add_to_cart')}>
                                                         <i className="fas fa-cart-plus"></i>
                                                     </button>
@@ -1286,9 +1284,33 @@ function App() {
             }}>
                 <div className="container">
                     <div className="footer-grid">
-                        <div className="footer-col">
-                            <h3>HBC Achar</h3>
-                            <p style={{ color: 'white' }}>{t('footer_desc')}</p>
+                        <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', flex: '2' }}>
+                            <div className="footer-col" style={{ flex: '1 1 200px' }}>
+                                <h3>HBC Achar</h3>
+                                <p style={{ color: 'white' }}>{t('footer_desc')}</p>
+                            </div>
+                            <div className="footer-col follow-us-col" style={{ flex: '1 1 150px' }}>
+                                <h3>Follow Us</h3>
+                                <div className="social-links">
+                                    <a href="https://www.facebook.com/groups/512382615075881/" target="_blank" aria-label="Facebook Group" className="facebook">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                                            <path fill="#039be5" d="M24 5A19 19 0 1 0 24 43A19 19 0 1 0 24 5Z" />
+                                            <path fill="#fff" d="M26.572,29.036h4.917l0.772-4.995h-5.69v-2.73c0-2.075,0.678-3.915,2.619-3.915h3.119v-4.359c-0.548-0.074-1.707-0.236-3.897-0.236c-4.573,0-7.254,2.415-7.254,7.917v3.323h-4.701v4.995h4.701v11.729C22.089,42.905,23.032,43,24,43c0.875,0,1.729-0.08,2.572-0.194V29.036z" />
+                                        </svg>
+                                    </a>
+                                    <a href="#" target="_blank" aria-label="TikTok" className="tiktok">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                                            <path fill="#000000" d="M24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,12.955,35.045,4,24,4z" />
+                                            <path fill="#FFFFFF" transform="translate(1, 3)" d="M33.3,16.8c-2.4-0.2-4.5-1.4-5.9-3.2v12.7c0,4.6-3.7,8.3-8.3,8.3s-8.3-3.7-8.3-8.3s3.7-8.3,8.3-8.3c0.5,0,1,0.1,1.5,0.2v4.3c-0.5-0.2-0.9-0.2-1.5-0.2c-2.3,0-4.2,1.9-4.2,4.2s1.9,4.2,4.2,4.2s4.2-1.9,4.2-4.2V6h4.2c0,3.3,2.1,6.1,5.1,7.4L33.3,16.8z" />
+                                        </svg>
+                                    </a>
+                                    <a href="#" target="_blank" aria-label="Telegram" className="telegram">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                                            <path fill="#29b6f6" d="M24,4C12.954,4,4,12.954,4,24s8.954,20,20,20s20-8.954,20-20S35.046,4,24,4z"></path><path fill="#fff" d="M33.95,15.233l-4.584,21.232c-0.242,1.124-0.89,1.403-1.82,0.882l-6.523-4.833l-3.14,3.024 c-0.341,0.341-0.633,0.631-1.217,0.631l0.44-6.611l11.725-10.697c0.516-0.472-0.084-0.729-0.75-0.259L16.92,25.831l-6.37-1.998 c-1.116-0.348-1.125-1.114,0.209-1.653l21.928-8.545C33.261,13.482,34.314,13.9,33.95,15.233z"></path>
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                         <div className="footer-col">
                             <h3>Quick Links</h3>
@@ -1299,28 +1321,6 @@ function App() {
                                 <li><a href="#about">About Us</a></li>
                                 <li><a href="#contact">Contact</a></li>
                             </ul>
-                        </div>
-                        <div className="footer-col follow-us-col">
-                            <h3>Follow Us</h3>
-                            <div className="social-links">
-                                <a href="https://www.facebook.com/groups/512382615075881/" target="_blank" aria-label="Facebook Group" className="facebook">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-                                        <path fill="#039be5" d="M24 5A19 19 0 1 0 24 43A19 19 0 1 0 24 5Z" />
-                                        <path fill="#fff" d="M26.572,29.036h4.917l0.772-4.995h-5.69v-2.73c0-2.075,0.678-3.915,2.619-3.915h3.119v-4.359c-0.548-0.074-1.707-0.236-3.897-0.236c-4.573,0-7.254,2.415-7.254,7.917v3.323h-4.701v4.995h4.701v11.729C22.089,42.905,23.032,43,24,43c0.875,0,1.729-0.08,2.572-0.194V29.036z" />
-                                    </svg>
-                                </a>
-                                <a href="#" target="_blank" aria-label="TikTok" className="tiktok">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-                                        <path fill="#000000" d="M24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,12.955,35.045,4,24,4z" />
-                                        <path fill="#FFFFFF" transform="translate(1, 3)" d="M33.3,16.8c-2.4-0.2-4.5-1.4-5.9-3.2v12.7c0,4.6-3.7,8.3-8.3,8.3s-8.3-3.7-8.3-8.3s3.7-8.3,8.3-8.3c0.5,0,1,0.1,1.5,0.2v4.3c-0.5-0.2-0.9-0.2-1.5-0.2c-2.3,0-4.2,1.9-4.2,4.2s1.9,4.2,4.2,4.2s4.2-1.9,4.2-4.2V6h4.2c0,3.3,2.1,6.1,5.1,7.4L33.3,16.8z" />
-                                    </svg>
-                                </a>
-                                <a href="#" target="_blank" aria-label="Telegram" className="telegram">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-                                        <path fill="#29b6f6" d="M24,4C12.954,4,4,12.954,4,24s8.954,20,20,20s20-8.954,20-20S35.046,4,24,4z"></path><path fill="#fff" d="M33.95,15.233l-4.584,21.232c-0.242,1.124-0.89,1.403-1.82,0.882l-6.523-4.833l-3.14,3.024 c-0.341,0.341-0.633,0.631-1.217,0.631l0.44-6.611l11.725-10.697c0.516-0.472-0.084-0.729-0.75-0.259L16.92,25.831l-6.37-1.998 c-1.116-0.348-1.125-1.114,0.209-1.653l21.928-8.545C33.261,13.482,34.314,13.9,33.95,15.233z"></path>
-                                    </svg>
-                                </a>
-                            </div>
                         </div>
                     </div>
                     <div className="copyright">
