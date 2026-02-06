@@ -1484,15 +1484,15 @@ function App() {
 
             {/* Mobile Bottom Navigation */}
             <div className="mobile-bottom-nav">
-                <button className="mobile-nav-btn" onClick={() => setIsCartOpen(true)}>
+                <a className="mobile-nav-btn" href="#" onClick={() => setIsCartOpen(true)}>
                     <img src={shoppingBagIcon} alt="Cart" />
                     {totalQty > 0 && <span className="cart-count-mobile">{totalQty}</span>}
                     <span>{lang === 'bn' ? 'কার্ট' : 'Cart'}</span>
-                </button>
-                <button className="mobile-nav-btn" onClick={() => alert(lang === 'bn' ? 'ব্যবহারকারী প্রোফাইল শীঘ্রই আসছে!' : 'User Profile coming soon!')}>
+                </a>
+                <a className="mobile-nav-btn" href="#" onClick={() => alert(lang === 'bn' ? 'ব্যবহারকারী প্রোফাইল শীঘ্রই আসছে!' : 'User Profile coming soon!')}>
                     <img src={userIcon} alt="User" />
                     <span>{lang === 'bn' ? 'প্রোফাইল' : 'Profile'}</span>
-                </button>
+                </a>
                 <button className="mobile-nav-btn" onClick={() => alert(lang === 'bn' ? 'অর্ডার ট্র্যাক শীঘ্রই আসছে!' : 'Track Order coming soon!')}>
                     <i className="fas fa-truck"></i>
                 </button>

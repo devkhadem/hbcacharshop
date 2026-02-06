@@ -587,19 +587,22 @@ header {
 .filter-section {
     display: flex;
     justify-content: center;
-    gap: 15px;
+    gap: 10px;
     margin-bottom: 30px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    overflow-x: auto;
 }
 
 .filter-btn {
     background: #ffffff;
     border: 1px solid #ddd;
-    padding: 8px 20px;
+    padding: 6px 12px;
     border-radius: 20px;
     color: var(--text-gray);
     font-weight: 500;
     transition: 0.3s;
+    font-size: 0.8rem;
+    white-space: nowrap;
 }
 
 .filter-btn:hover,
@@ -1913,8 +1916,9 @@ footer {
     .footer-grid {
         display: grid;
         grid-template-columns: 1fr !important;
-        gap: 15px;
+        gap: 10px;
         justify-items: center;
+        padding: 0;
     }
 
     .service-features {
@@ -1949,7 +1953,6 @@ footer {
 
     .product-card {
         width: 100%;
-        max-width: 280px;
         margin-top: 10px;
     }
 
@@ -2217,7 +2220,9 @@ footer {
 .mobile-nav-btn img {
     width: 1.4rem;
     height: 1.4rem;
-    filter: brightness(0) invert(1);
+    background: var(--white);
+    border-radius: 50%;
+    padding: 2px;
 }
 
 .mobile-nav-btn i {
