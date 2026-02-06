@@ -2101,6 +2101,10 @@ footer {
         max-height: 35vh;
     }
 
+    .footer-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
     .footer-col {
         text-align: center;
         align-items: center;
@@ -2368,5 +2372,20 @@ footer {
 
     .about-content {
         padding: 5vh 6vw;
+    }
+
+    .footer-links-wrapper {
+        display: flex;
+        gap: 20px;
+    }
+
+    .footer-links-section {
+        flex: 1;
+    }
+
+    .follow-us-col {
+        grid-column: 1 / -1;
+        text-align: center;
+        justify-content: center;
     }
 }

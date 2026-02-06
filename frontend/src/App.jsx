@@ -1300,8 +1300,8 @@ function App() {
                                 <li><a href="#contact">Contact</a></li>
                             </ul>
                         </div>
-                        <div className="footer-col">
-                            <h3>&nbsp;&nbsp;Follow Us</h3>
+                        <div className="footer-col follow-us-col">
+                            <h3>Follow Us</h3>
                             <div className="social-links">
                                 <a href="https://www.facebook.com/groups/512382615075881/" target="_blank" aria-label="Facebook Group" className="facebook">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
