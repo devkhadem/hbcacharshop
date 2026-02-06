@@ -756,7 +756,7 @@ header {
 .product-actions {
     display: flex;
     width: 100%;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     margin-top: 12px;
     gap: 8px;
@@ -1910,13 +1910,20 @@ footer {
         font-size: 1.2rem;
     }
 
-    .products-grid,
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 15px;
+        justify-items: center;
+        padding: 0;
+    }
+
     .reviews-grid,
     .contact-grid,
     .footer-grid {
         display: grid;
         grid-template-columns: 1fr !important;
-        gap: 10px;
+        gap: 20px;
         justify-items: center;
         padding: 0;
     }
@@ -2220,7 +2227,9 @@ footer {
 .mobile-nav-btn img {
     width: 1.4rem;
     height: 1.4rem;
-    filter: brightness(0) invert(1);
+    background: var(--white);
+    border-radius: 50%;
+    padding: 2px;
 }
 
 .mobile-nav-btn i {
@@ -2265,6 +2274,14 @@ footer {
 }
 
 
+
+/* Product Top Actions */
+.product-top-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
 
 /* --- Delivery Partners Section --- */
 .delivery-partners-section {

@@ -1083,14 +1083,16 @@ function App() {
                                                 <div>
                                                     <span className="price">{formatPrice(product.price)}</span>
                                                 </div>
-                                                <div className="product-actions">
+                                                <div className="product-top-actions">
                                                     <button className="add-btn" onClick={() => openQuantityModal(product)} title={t('add_to_cart')}>
                                                         <i className="fas fa-cart-plus"></i>
                                                     </button>
-                                                    <button className="buy-now-btn" onClick={() => { addToCart(product); setIsCartOpen(true); setIsCheckoutOpen(true); }}>{t('buy_now')}</button>
                                                     <button className="whatsapp-btn-card" onClick={() => handleWhatsAppInquiry(product)} title={lang === 'bn' ? "হোয়াটসঅ্যাপে অর্ডার করুন" : "Order on WhatsApp"}>
                                                         <i className="fab fa-whatsapp"></i>
                                                     </button>
+                                                </div>
+                                                <div className="product-actions">
+                                                    <button className="buy-now-btn" onClick={() => { addToCart(product); setIsCartOpen(true); setIsCheckoutOpen(true); }}>{t('buy_now')}</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -1484,15 +1486,15 @@ function App() {
 
             {/* Mobile Bottom Navigation */}
             <div className="mobile-bottom-nav">
-                <button className="mobile-nav-btn" onClick={() => setIsCartOpen(true)}>
+                <a className="mobile-nav-btn" href="#" onClick={() => setIsCartOpen(true)}>
                     <img src={shoppingBagIcon} alt="Cart" />
                     {totalQty > 0 && <span className="cart-count-mobile">{totalQty}</span>}
                     <span>{lang === 'bn' ? 'কার্ট' : 'Cart'}</span>
-                </button>
-                <button className="mobile-nav-btn" onClick={() => alert(lang === 'bn' ? 'ব্যবহারকারী প্রোফাইল শীঘ্রই আসছে!' : 'User Profile coming soon!')}>
+                </a>
+                <a className="mobile-nav-btn" href="#" onClick={() => alert(lang === 'bn' ? 'ব্যবহারকারী প্রোফাইল শীঘ্রই আসছে!' : 'User Profile coming soon!')}>
                     <img src={userIcon} alt="User" />
                     <span>{lang === 'bn' ? 'প্রোফাইল' : 'Profile'}</span>
-                </button>
+                </a>
                 <button className="mobile-nav-btn" onClick={() => alert(lang === 'bn' ? 'অর্ডার ট্র্যাক শীঘ্রই আসছে!' : 'Track Order coming soon!')}>
                     <i className="fas fa-truck"></i>
                 </button>
