@@ -8,12 +8,12 @@ const coverImage = "https://picsum.photos/seed/cover/800/400";
 import footerImage from './assets/images/footerimage.jpeg';
 
 // --- Slider Images ---
-import slide1 from './assets/images/slider/1.jpg';
-import slide2 from './assets/images/slider/2.jpg';
-import slide3 from './assets/images/slider/3.jpg';
-import slide4 from './assets/images/slider/4.jpg';
-import slide5 from './assets/images/slider/5.jpg';
-import slide6 from './assets/images/slider/6.jpg';
+import slide1 from './assets/images/slider/1.jpeg';
+import slide2 from './assets/images/slider/2.jpeg';
+import slide3 from './assets/images/slider/3.jpeg';
+import slide4 from './assets/images/slider/4.jpeg';
+import slide5 from './assets/images/slider/5.jpeg';
+import slide6 from './assets/images/slider/6.jpeg';
 
 // --- Product Images ---
 import prod1 from './assets/images/products/1.jpg';
@@ -534,13 +534,21 @@ function App() {
     const [currentPage, setCurrentPage] = useState('home');
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
     const [activeSection, setActiveSection] = useState('home');
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+    // Handle window resize for mobile detection
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     // Body Scroll Lock when Menu is Open
     useEffect(() => {
         if (isMenuOpen) {
             document.body.style.overflow = 'hidden';
         } else {
-            document.body.style.overflow = 'unset';
+            document.body.style.overflow = 'auto';
         }
     }, [isMenuOpen]);
 
@@ -617,6 +625,37 @@ function App() {
         const interval = setInterval(updateCountdown, 1000);
         return () => clearInterval(interval);
     }, []);
+
+    // Handle Navigation Click
+    const handleNavClick = (e, sectionId) => {
+        e.preventDefault();
+        setIsMenuOpen(false);
+        document.body.style.overflow = 'auto';
+
+        const performScroll = (retryCount = 0) => {
+            if (sectionId === 'home') {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                const element = document.getElementById(sectionId);
+                if (element) {
+                    const headerOffset = 85;
+                    const elementPosition = element.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.scrollY - headerOffset;
+                    window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+                } else if (retryCount < 10) {
+                    // এলিমেন্ট না পাওয়া গেলে ১০০ms পর আবার চেষ্টা করবে (সর্বোচ্চ ১০ বার)
+                    setTimeout(() => performScroll(retryCount + 1), 100);
+                }
+            }
+        };
+
+        if (currentPage !== 'home') {
+            setCurrentPage('home');
+            setTimeout(() => performScroll(), 400);
+        } else {
+            setTimeout(() => performScroll(), 300);
+        }
+    };
 
     const toggleTheme = () => {
         setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
@@ -793,7 +832,7 @@ function App() {
 
     return (
         <div className="App" id="top">
-            {isMenuOpen && <div className="overlay" onClick={() => setIsMenuOpen(false)}></div>}
+            {isMenuOpen && <div className="overlay" onClick={() => setIsMenuOpen(false)} style={{ zIndex: 998 }}></div>}
 
             {/* Header */}
             <header>
@@ -853,26 +892,31 @@ function App() {
                         </div>
                     </div>
 
-                    <button className="menu-toggle" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                    <button
+                        className="menu-toggle"
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', marginLeft: '10px', color: 'inherit', zIndex: 1001 }}
+                    >
                         <i className={`fas ${isMenuOpen ? 'fa-times' : 'fa-bars'}`}></i>
                     </button>
-                    <nav className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
-                        <a href="#top" className={activeSection === 'home' ? 'active' : ''} onClick={() => { setCurrentPage('home'); setIsMenuOpen(false); }}>
+
+                    <nav className={`nav-links ${isMenuOpen ? 'active' : ''}`} style={isMenuOpen ? { zIndex: 10001, pointerEvents: 'auto' } : {}}>
+                        <a href="#home" className={activeSection === 'home' ? 'active' : ''} onClick={(e) => handleNavClick(e, 'home')}>
                             <i className="fas fa-home nav-icon"></i> Home
                         </a>
-                        <a href="#products" className={activeSection === 'products' ? 'active' : ''} onClick={() => { setCurrentPage('home'); setIsMenuOpen(false); }}>
+                        <a href="#products" className={activeSection === 'products' ? 'active' : ''} onClick={(e) => handleNavClick(e, 'products')}>
                             <i className="fas fa-shopping-basket nav-icon"></i> Our Pickles
                         </a>
-                        <a href="#services" className={activeSection === 'services' ? 'active' : ''} onClick={() => { setCurrentPage('home'); setIsMenuOpen(false); }}>
+                        <a href="#services" className={activeSection === 'services' ? 'active' : ''} onClick={(e) => handleNavClick(e, 'services')}>
                             <i className="fas fa-concierge-bell nav-icon"></i> Services
                         </a>
-                        <a href="#about" className={activeSection === 'about' ? 'active' : ''} onClick={() => { setCurrentPage('home'); setIsMenuOpen(false); }}>
+                        <a href="#about" className={activeSection === 'about' ? 'active' : ''} onClick={(e) => handleNavClick(e, 'about')}>
                             <i className="fas fa-info-circle nav-icon"></i> About Us
                         </a>
-                        <a href="#contact" className={activeSection === 'contact' ? 'active' : ''} onClick={() => { setCurrentPage('home'); setIsMenuOpen(false); }}>
+                        <a href="#contact" className={activeSection === 'contact' ? 'active' : ''} onClick={(e) => handleNavClick(e, 'contact')}>
                             <i className="fas fa-envelope nav-icon"></i> Contact
                         </a>
-                        <a href="#" onClick={() => { alert(lang === 'bn' ? 'অর্ডার ট্র্যাক শীঘ্রই আসছে!' : 'Track Order coming soon!'); setIsMenuOpen(false); }}>
+                        <a href="#" onClick={(e) => { e.preventDefault(); alert(lang === 'bn' ? 'অর্ডার ট্র্যাক শীঘ্রই আসছে!' : 'Track Order coming soon!'); setIsMenuOpen(false); }}>
                             <i className="fas fa-truck nav-icon"></i>
                         </a>
                     </nav>
@@ -1486,17 +1530,18 @@ function App() {
 
             {/* Mobile Bottom Navigation */}
             <div className="mobile-bottom-nav">
-                <a className="mobile-nav-btn" href="#" onClick={() => setIsCartOpen(true)}>
+                <button className="mobile-nav-btn" onClick={(e) => { e.preventDefault(); setIsCartOpen(true); }}>
                     <img src={shoppingBagIcon} alt="Cart" />
                     {totalQty > 0 && <span className="cart-count-mobile">{totalQty}</span>}
                     <span>{lang === 'bn' ? 'কার্ট' : 'Cart'}</span>
-                </a>
-                <a className="mobile-nav-btn" href="#" onClick={() => alert(lang === 'bn' ? 'ব্যবহারকারী প্রোফাইল শীঘ্রই আসছে!' : 'User Profile coming soon!')}>
-                    <img src={userIcon} alt="User" />
-                    <span>{lang === 'bn' ? 'প্রোফাইল' : 'Profile'}</span>
-                </a>
-                <button className="mobile-nav-btn" onClick={() => alert(lang === 'bn' ? 'অর্ডার ট্র্যাক শীঘ্রই আসছে!' : 'Track Order coming soon!')}>
-                    <i className="fas fa-truck"></i>
+                </button>
+                <button className="mobile-nav-btn" onClick={(e) => handleNavClick(e, 'home')}>
+                    <i className="fas fa-home"></i>
+                    <span>{lang === 'bn' ? 'হোম' : 'Home'}</span>
+                </button>
+                <button className="mobile-nav-btn" onClick={(e) => handleNavClick(e, 'products')}>
+                    <i className="fas fa-shopping-basket"></i>
+                    <span>{lang === 'bn' ? 'পণ্য' : 'Products'}</span>
                 </button>
                 <button className="mobile-nav-btn" onClick={toggleTheme}>
                     {theme === 'light' ? <i className="fas fa-moon"></i> : <i className="fas fa-sun"></i>}
