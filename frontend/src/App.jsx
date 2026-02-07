@@ -552,6 +552,13 @@ function App() {
         }
     }, [isMenuOpen]);
 
+    // Close menu when switching to mobile
+    useEffect(() => {
+        if (isMobile) {
+            setIsMenuOpen(false);
+        }
+    }, [isMobile]);
+
     // Location State
     const [selectedDistrict, setSelectedDistrict] = useState('');
     const [selectedUpazila, setSelectedUpazila] = useState('');
@@ -890,36 +897,29 @@ function App() {
                             <span>{String(timeLeft.minutes).padStart(2, '0')}m</span>:
                             <span>{String(timeLeft.seconds).padStart(2, '0')}s</span>
                         </div>
+                        <button
+                            className="hamburger-btn"
+                            onClick={() => setIsMenuOpen(true)}
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                fontSize: '1.5rem',
+                                cursor: 'pointer',
+                                marginLeft: '10px',
+                                color: 'var(--text-color, #333)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}
+                        >
+                            <svg width="24" height="18" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="24" height="2" rx="1" fill="currentColor" />
+                                <rect y="8" width="24" height="2" rx="1" fill="currentColor" />
+                                <rect y="16" width="24" height="2" rx="1" fill="currentColor" />
+                            </svg>
+                        </button>
                     </div>
 
-                    <button
-                        className="menu-toggle"
-                        onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', marginLeft: '10px', color: 'inherit', zIndex: 1001 }}
-                    >
-                        <i className={`fas ${isMenuOpen ? 'fa-times' : 'fa-bars'}`}></i>
-                    </button>
-
-                    <nav className={`nav-links ${isMenuOpen ? 'active' : ''}`} style={isMenuOpen ? { zIndex: 10001, pointerEvents: 'auto' } : {}}>
-                        <a href="#home" className={activeSection === 'home' ? 'active' : ''} onClick={(e) => handleNavClick(e, 'home')}>
-                            <i className="fas fa-home nav-icon"></i> Home
-                        </a>
-                        <a href="#products" className={activeSection === 'products' ? 'active' : ''} onClick={(e) => handleNavClick(e, 'products')}>
-                            <i className="fas fa-shopping-basket nav-icon"></i> Our Pickles
-                        </a>
-                        <a href="#services" className={activeSection === 'services' ? 'active' : ''} onClick={(e) => handleNavClick(e, 'services')}>
-                            <i className="fas fa-concierge-bell nav-icon"></i> Services
-                        </a>
-                        <a href="#about" className={activeSection === 'about' ? 'active' : ''} onClick={(e) => handleNavClick(e, 'about')}>
-                            <i className="fas fa-info-circle nav-icon"></i> About Us
-                        </a>
-                        <a href="#contact" className={activeSection === 'contact' ? 'active' : ''} onClick={(e) => handleNavClick(e, 'contact')}>
-                            <i className="fas fa-envelope nav-icon"></i> Contact
-                        </a>
-                        <a href="#" onClick={(e) => { e.preventDefault(); alert(lang === 'bn' ? 'অর্ডার ট্র্যাক শীঘ্রই আসছে!' : 'Track Order coming soon!'); setIsMenuOpen(false); }}>
-                            <i className="fas fa-truck nav-icon"></i>
-                        </a>
-                    </nav>
                     <div className="nav-icons">
                         <div className="cart-btn-wrapper">
                             <button className="cart-btn" onClick={() => setIsCartOpen(true)}>
@@ -953,6 +953,48 @@ function App() {
                     </div>
                 </div>
             </header>
+
+            {/* Mobile Menu Drawer */}
+            <div className={`mobile-menu-drawer ${isMenuOpen ? 'active' : ''}`} style={{
+                position: 'fixed',
+                top: 0,
+                right: isMenuOpen ? 0 : '-100%',
+                width: '280px',
+                height: '100%',
+                backgroundColor: '#fff',
+                boxShadow: '-2px 0 10px rgba(0,0,0,0.1)',
+                zIndex: 1000,
+                transition: 'right 0.3s ease-in-out',
+                padding: '20px',
+                display: 'flex',
+                flexDirection: 'column',
+                overflowY: 'auto'
+            }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
+                    <img src={logo} alt="HBC Achar" style={{ height: '40px' }} />
+                    <button onClick={() => setIsMenuOpen(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>&times;</button>
+                </div>
+                <nav style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                    <a href="#home" onClick={(e) => handleNavClick(e, 'home')} style={{ textDecoration: 'none', color: activeSection === 'home' ? 'var(--secondary-orange)' : '#333', fontWeight: 'bold', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <i className="fas fa-home" style={{ width: '25px', color: 'var(--secondary-orange)' }}></i> Home
+                    </a>
+                    <a href="#products" onClick={(e) => handleNavClick(e, 'products')} style={{ textDecoration: 'none', color: activeSection === 'products' ? 'var(--secondary-orange)' : '#333', fontWeight: 'bold', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <i className="fas fa-shopping-basket" style={{ width: '25px', color: 'var(--secondary-orange)' }}></i> Our Pickles
+                    </a>
+                    <a href="#services" onClick={(e) => handleNavClick(e, 'services')} style={{ textDecoration: 'none', color: activeSection === 'services' ? 'var(--secondary-orange)' : '#333', fontWeight: 'bold', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <i className="fas fa-concierge-bell" style={{ width: '25px', color: 'var(--secondary-orange)' }}></i> {t('services')}
+                    </a>
+                    <a href="#about" onClick={(e) => handleNavClick(e, 'about')} style={{ textDecoration: 'none', color: activeSection === 'about' ? 'var(--secondary-orange)' : '#333', fontWeight: 'bold', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <i className="fas fa-info-circle" style={{ width: '25px', color: 'var(--secondary-orange)' }}></i> {t('about_title')}
+                    </a>
+                    <a href="#contact" onClick={(e) => handleNavClick(e, 'contact')} style={{ textDecoration: 'none', color: activeSection === 'contact' ? 'var(--secondary-orange)' : '#333', fontWeight: 'bold', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <i className="fas fa-envelope" style={{ width: '25px', color: 'var(--secondary-orange)' }}></i> {t('contact_title')}
+                    </a>
+                    <a href="#" onClick={() => setIsCartOpen(true)} style={{ textDecoration: 'none', color: '#333', fontWeight: 'bold', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <i className="fas fa-shopping-cart" style={{ width: '25px', color: 'var(--secondary-orange)' }}></i> Cart ({totalQty})
+                    </a>
+                </nav>
+            </div>
 
             {/* Flash Sale Hero */}
             {currentPage === 'home' && (
@@ -1318,6 +1360,8 @@ function App() {
                 </main>
             )}
 
+
+
             {/* Footer */}
             <footer style={{
                 backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url(${footerImage})`,
@@ -1527,31 +1571,6 @@ function App() {
 
             {/* Floating WhatsApp Button */}
             <DraggableWhatsAppButton />
-
-            {/* Mobile Bottom Navigation */}
-            <div className="mobile-bottom-nav">
-                <button className="mobile-nav-btn" onClick={(e) => { e.preventDefault(); setIsCartOpen(true); }}>
-                    <img src={shoppingBagIcon} alt="Cart" />
-                    {totalQty > 0 && <span className="cart-count-mobile">{totalQty}</span>}
-                    <span>{lang === 'bn' ? 'কার্ট' : 'Cart'}</span>
-                </button>
-                <button className="mobile-nav-btn" onClick={(e) => handleNavClick(e, 'home')}>
-                    <i className="fas fa-home"></i>
-                    <span>{lang === 'bn' ? 'হোম' : 'Home'}</span>
-                </button>
-                <button className="mobile-nav-btn" onClick={(e) => handleNavClick(e, 'products')}>
-                    <i className="fas fa-shopping-basket"></i>
-                    <span>{lang === 'bn' ? 'পণ্য' : 'Products'}</span>
-                </button>
-                <button className="mobile-nav-btn" onClick={toggleTheme}>
-                    {theme === 'light' ? <i className="fas fa-moon"></i> : <i className="fas fa-sun"></i>}
-                    <span>{lang === 'bn' ? 'থিম' : 'Theme'}</span>
-                </button>
-                <button className="mobile-nav-btn" onClick={() => setLang(lang === 'en' ? 'bn' : 'en')}>
-                    <i className="fas fa-globe"></i>
-                    <span>{lang === 'en' ? 'বাংলা' : 'English'}</span>
-                </button>
-            </div>
         </div>
     );
 }
