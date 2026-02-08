@@ -124,7 +124,7 @@ const translations = {
     sweet: { en: "Sweet", bn: "মিষ্টি" },
     spicy: { en: "Spicy", bn: "ঝাল" },
     mixed: { en: "Mixed", bn: "মিশ্র" },
-    services: { en: "Our Services", bn: "আমাদের সেবাসমূহ" },
+    services: { en: "Services", bn: "সেবাসমূহ" },
     services_desc: { en: "We are committed to delivering the best quality products and customer service", bn: "আমরা সেরা মানের পণ্য এবং গ্রাহক সেবা প্রদানে প্রতিশ্রুতিবদ্ধ" },
     fast_delivery: { en: "Fast Delivery", bn: "দ্রুত ডেলিভারি" },
     fast_delivery_desc: { en: "Fast and reliable home delivery service across Bangladesh", bn: "সারা বাংলাদেশে দ্রুত এবং নির্ভরযোগ্য হোম ডেলিভারি সার্ভিস" },
@@ -150,7 +150,7 @@ const translations = {
     bsti_approved: { en: "BSTI Approved Food Products", bn: "BSTI অনুমোদিত খাদ্যপণ্য" },
     bsti_approved_desc: { en: "The products are recognized by the quality control organization BSTI.", bn: "পণ্যগুলো মান নিয়ন্ত্রণকারী সংস্থা BSTI দ্বারা স্বীকৃত।" },
 
-    about_title: { en: "About Us", bn: "আমাদের সম্পর্কে" },
+    about_title: { en: "About", bn: "আমাদের সম্পর্কে" },
     about_text: { en: "Welcome to Achar Hub Pickle. We bring you the lost tradition of rural Bengal, which makes your everyday simple food royal. Our pickles are made with 100% mustard oil, pure jaggery, and local spices. No chemical preservatives. Being sun-dried, its taste and aroma are unparalleled. Our signature collection includes Mango Series, Garlic Series, and Sour-Spicy-Sweet Fusion.", bn: "Achar Hub Pickle-এ আপনাকে স্বাগতম। আমরা নিয়ে এসেছি গ্রাম-বাংলার সেই হারানো ঐতিহ্য, যা আপনার প্রতিদিনের সাধারণ খাবারকেও করে তুলবে রাজকীয়। আমাদের আচার তৈরিতে ব্যবহৃত হয় শতভাগ সরিষার তেল, খাঁটি গুড় এবং দেশি মসলা। কোনো রাসায়নিক সংরক্ষক নেই। রোদে শুকিয়ে তৈরি করা হয় বলে এর স্বাদ এবং গন্ধ অতুলনীয়। আমাদের সিগনেচার কালেকশনের মধ্যে রয়েছে ম্যাঙ্গো সিরিজ, গার্লিক সিরিজ এবং টক-ঝাল-মিষ্টির ফিউশন।" },
     about_list1: { en: "100% handmade", bn: "১০০% হাতে তৈরি" },
     about_list2: { en: "No formalin", bn: "কোনো ফরমালিন মুক্ত" },
@@ -159,7 +159,7 @@ const translations = {
     contact_info_desc: { en: "Feel free to reach out to us through any of the following methods.", bn: "যেকোনো প্রয়োজনে নিচের মাধ্যমে আমাদের সাথে যোগাযোগ করুন।" },
     address: { en: "Address", bn: "ঠিকানা" },
     address_text: { en: "Charpakundia, Pakundia, Kishoreganj, Dhaka.", bn: "চরপাকুন্দিয়া, পাকুন্দিয়া, কিশোরগঞ্জ, ঢাকা।" },
-    contact_title: { en: "Contact Us", bn: "যোগাযোগ করুন" },
+    contact_title: { en: "Contact", bn: "যোগাযোগ" },
     contact_desc: { en: "Call us, email us, or fill out the form below for any needs", bn: "যেকোনো প্রয়োজনে আমাদের কল করুন, ইমেইল করুন অথবা নিচের ফর্মটি পূরণ করুন" },
     phone: { en: "Phone", bn: "ফোন" },
     email: { en: "Email", bn: "ইমেইল" },
@@ -847,7 +847,14 @@ function App() {
                     <a href="#" className="logo"><img src={logo} alt="HBC Achar" /></a>
 
                     {/* Wrapper for Button and Timer */}
-                    <div className="flash-sale-wrapper" style={{ display: 'flex', alignItems: 'center', marginLeft: '10px', marginRight: 'auto', gap: '10px' }}>
+                    <div className="flash-sale-wrapper" style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        marginLeft: isMobile ? 0 : '10px',
+                        gap: '10px',
+                        flex: isMobile ? 1 : 'unset',
+                        justifyContent: isMobile ? 'center' : 'flex-start'
+                    }}>
                         <button
                             className="flash-sale-nav-btn"
                             onClick={() => { setCurrentPage('flashsale'); window.scrollTo(0, 0); }}
@@ -897,6 +904,8 @@ function App() {
                             <span>{String(timeLeft.minutes).padStart(2, '0')}m</span>:
                             <span>{String(timeLeft.seconds).padStart(2, '0')}s</span>
                         </div>
+                    </div>
+                    {isMobile && (
                         <button
                             className="hamburger-btn"
                             onClick={() => setIsMenuOpen(true)}
@@ -909,7 +918,8 @@ function App() {
                                 color: 'var(--text-color, #333)',
                                 display: 'flex',
                                 alignItems: 'center',
-                                justifyContent: 'center'
+                                justifyContent: 'center',
+                                order: 2
                             }}
                         >
                             <svg width="24" height="18" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -918,39 +928,61 @@ function App() {
                                 <rect y="16" width="24" height="2" rx="1" fill="currentColor" />
                             </svg>
                         </button>
-                    </div>
+                    )}
 
-                    <div className="nav-icons">
-                        <div className="cart-btn-wrapper">
-                            <button className="cart-btn" onClick={() => setIsCartOpen(true)}>
-                                <img src={shoppingBagIcon} alt="Cart" />
+                    {!isMobile && (
+                        <nav className="desktop-nav" style={{ display: 'flex', gap: '20px', alignItems: 'center', flex: 1, justifyContent: 'center' }}>
+                            <a href="#home" onClick={(e) => handleNavClick(e, 'home')} style={{ textDecoration: 'none', color: activeSection === 'home' ? 'var(--secondary-orange)' : '#fff', fontWeight: '500', padding: '5px 0' }}>
+                                Home
+                            </a>
+                            <a href="#products" onClick={(e) => handleNavClick(e, 'products')} style={{ textDecoration: 'none', color: activeSection === 'products' ? 'var(--secondary-orange)' : '#fff', fontWeight: '500', padding: '5px 0' }}>
+                                Pickles
+                            </a>
+                            <a href="#services" onClick={(e) => handleNavClick(e, 'services')} style={{ textDecoration: 'none', color: activeSection === 'services' ? 'var(--secondary-orange)' : '#fff', fontWeight: '500', padding: '5px 0' }}>
+                                {t('services')}
+                            </a>
+                            <a href="#about" onClick={(e) => handleNavClick(e, 'about')} style={{ textDecoration: 'none', color: activeSection === 'about' ? 'var(--secondary-orange)' : '#fff', fontWeight: '500', padding: '5px 0' }}>
+                                {t('about_title')}
+                            </a>
+                            <a href="#contact" onClick={(e) => handleNavClick(e, 'contact')} style={{ textDecoration: 'none', color: activeSection === 'contact' ? 'var(--secondary-orange)' : '#fff', fontWeight: '500', padding: '5px 0' }}>
+                                {t('contact_title')}
+                            </a>
+                        </nav>
+                    )}
+
+                    {!isMobile && (
+                        <div className="nav-icons" style={{ position: 'relative', zIndex: 20 }}>
+                            <div className="cart-btn-wrapper">
+                                <button className="cart-btn" onClick={() => setIsCartOpen(true)}>
+                                    <img src={shoppingBagIcon} alt="Cart" />
+                                </button>
+                                <span className="cart-count">{totalQty}</span>
+                            </div>
+                            <div className="user-menu-wrapper">
+                                <button className="user-btn">
+                                    <img src={userIcon} alt="User" />
+                                </button>
+                                <div className="user-dropdown">
+                                    <a href="#">Sign In</a>
+                                    <a href="#">Sign Up</a>
+                                </div>
+                            </div>
+                            <div className="language-selector">
+                                <select value={lang} onChange={(e) => setLang(e.target.value)}>
+                                    <option value="en">English</option>
+                                    <option value="bn">বাংলা</option>
+                                </select>
+                            </div>
+                            <button className="theme-toggle" onClick={toggleTheme} title="Toggle Theme">
+                                {theme === 'light' ? <i className="fas fa-moon"></i> : <i className="fas fa-sun"></i>}
                             </button>
-                            <span className="cart-count">{totalQty}</span>
-                        </div>
-                        <div className="user-menu-wrapper">
-                            <button className="user-btn">
-                                <img src={userIcon} alt="User" />
-                            </button>
-                            <div className="user-dropdown">
-                                <a href="#">Sign In</a>
-                                <a href="#">Sign Up</a>
+                            <div className="track-order-btn-wrapper">
+                                <button className="track-order-btn" onClick={() => alert(lang === 'bn' ? 'অর্ডার ট্র্যাক শীঘ্রই আসছে!' : 'Track Order coming soon!')} title={t('track_order')}>
+                                    <i className="fas fa-truck"></i>
+                                </button>
                             </div>
                         </div>
-                        <div className="language-selector">
-                            <select value={lang} onChange={(e) => setLang(e.target.value)}>
-                                <option value="en">English</option>
-                                <option value="bn">বাংলা</option>
-                            </select>
-                        </div>
-                        <button className="theme-toggle" onClick={toggleTheme} title="Toggle Theme">
-                            {theme === 'light' ? <i className="fas fa-moon"></i> : <i className="fas fa-sun"></i>}
-                        </button>
-                        <div className="track-order-btn-wrapper">
-                            <button className="track-order-btn" onClick={() => alert(lang === 'bn' ? 'অর্ডার ট্র্যাক শীঘ্রই আসছে!' : 'Track Order coming soon!')} title={t('track_order')}>
-                                <i className="fas fa-truck"></i>
-                            </button>
-                        </div>
-                    </div>
+                    )}
                 </div>
             </header>
 
@@ -961,7 +993,7 @@ function App() {
                 right: isMenuOpen ? 0 : '-100%',
                 width: '280px',
                 height: '100%',
-                backgroundColor: '#fff',
+                backgroundColor: 'var(--header-bg)',
                 boxShadow: '-2px 0 10px rgba(0,0,0,0.1)',
                 zIndex: 1000,
                 transition: 'right 0.3s ease-in-out',
@@ -970,28 +1002,25 @@ function App() {
                 flexDirection: 'column',
                 overflowY: 'auto'
             }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '10px' }}>
                     <img src={logo} alt="HBC Achar" style={{ height: '40px' }} />
-                    <button onClick={() => setIsMenuOpen(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>&times;</button>
+                    <button onClick={() => setIsMenuOpen(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#fff' }}>&times;</button>
                 </div>
                 <nav style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                    <a href="#home" onClick={(e) => handleNavClick(e, 'home')} style={{ textDecoration: 'none', color: activeSection === 'home' ? 'var(--secondary-orange)' : '#333', fontWeight: 'bold', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <a href="#home" onClick={(e) => handleNavClick(e, 'home')} style={{ textDecoration: 'none', color: activeSection === 'home' ? 'var(--secondary-orange)' : '#fff', fontWeight: 'bold', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <i className="fas fa-home" style={{ width: '25px', color: 'var(--secondary-orange)' }}></i> Home
                     </a>
-                    <a href="#products" onClick={(e) => handleNavClick(e, 'products')} style={{ textDecoration: 'none', color: activeSection === 'products' ? 'var(--secondary-orange)' : '#333', fontWeight: 'bold', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <i className="fas fa-shopping-basket" style={{ width: '25px', color: 'var(--secondary-orange)' }}></i> Our Pickles
+                    <a href="#products" onClick={(e) => handleNavClick(e, 'products')} style={{ textDecoration: 'none', color: activeSection === 'products' ? 'var(--secondary-orange)' : '#fff', fontWeight: 'bold', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <i className="fas fa-shopping-basket" style={{ width: '25px', color: 'var(--secondary-orange)' }}></i> Pickles
                     </a>
-                    <a href="#services" onClick={(e) => handleNavClick(e, 'services')} style={{ textDecoration: 'none', color: activeSection === 'services' ? 'var(--secondary-orange)' : '#333', fontWeight: 'bold', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <a href="#services" onClick={(e) => handleNavClick(e, 'services')} style={{ textDecoration: 'none', color: activeSection === 'services' ? 'var(--secondary-orange)' : '#fff', fontWeight: 'bold', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <i className="fas fa-concierge-bell" style={{ width: '25px', color: 'var(--secondary-orange)' }}></i> {t('services')}
                     </a>
-                    <a href="#about" onClick={(e) => handleNavClick(e, 'about')} style={{ textDecoration: 'none', color: activeSection === 'about' ? 'var(--secondary-orange)' : '#333', fontWeight: 'bold', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <a href="#about" onClick={(e) => handleNavClick(e, 'about')} style={{ textDecoration: 'none', color: activeSection === 'about' ? 'var(--secondary-orange)' : '#fff', fontWeight: 'bold', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <i className="fas fa-info-circle" style={{ width: '25px', color: 'var(--secondary-orange)' }}></i> {t('about_title')}
                     </a>
-                    <a href="#contact" onClick={(e) => handleNavClick(e, 'contact')} style={{ textDecoration: 'none', color: activeSection === 'contact' ? 'var(--secondary-orange)' : '#333', fontWeight: 'bold', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <a href="#contact" onClick={(e) => handleNavClick(e, 'contact')} style={{ textDecoration: 'none', color: activeSection === 'contact' ? 'var(--secondary-orange)' : '#fff', fontWeight: 'bold', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <i className="fas fa-envelope" style={{ width: '25px', color: 'var(--secondary-orange)' }}></i> {t('contact_title')}
-                    </a>
-                    <a href="#" onClick={() => setIsCartOpen(true)} style={{ textDecoration: 'none', color: '#333', fontWeight: 'bold', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <i className="fas fa-shopping-cart" style={{ width: '25px', color: 'var(--secondary-orange)' }}></i> Cart ({totalQty})
                     </a>
                 </nav>
             </div>
@@ -1281,7 +1310,7 @@ function App() {
                                     <p className="about-intro">{t('about_text')}</p>
                                     {/* Delivery Partners Section moved inside about-content */}
                                     <div className="delivery-partners-section">
-                                        <h3 className="section-title" style={{ fontSize: '3vh', marginTop: '0', marginBottom: '2vh' }}>📦 {t('delivery_partners_title')} 📦</h3>
+                                        <h3 className="section-title" style={{ fontSize: isMobile ? '0.9rem' : '3vh', marginTop: '0', marginBottom: '2vh' }}>📦 {t('delivery_partners_title')} 📦</h3>
                                         <p className="delivery-desc">{t('delivery_partners_desc')}</p>
                                         <div className="partners-grid">
                                             {[
@@ -1368,48 +1397,94 @@ function App() {
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
-                backgroundColor: 'var(--footer-bg)'
+                backgroundColor: 'var(--footer-bg)',
+                paddingBottom: isMobile ? '70px' : '0'
             }}>
                 <div className="container">
-                    <div className="footer-grid">
-                        <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', flex: '2' }}>
-                            <div className="footer-col" style={{ flex: '1 1 200px' }}>
-                                <h3>HBC Achar</h3>
-                                <p style={{ color: 'white' }}>{t('footer_desc')}</p>
-                            </div>
-                            <div className="footer-col follow-us-col" style={{ flex: '1 1 150px' }}>
-                                <h3>Follow Us</h3>
-                                <div className="social-links">
-                                    <a href="https://www.facebook.com/groups/512382615075881/" target="_blank" aria-label="Facebook Group" className="facebook">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-                                            <path fill="#039be5" d="M24 5A19 19 0 1 0 24 43A19 19 0 1 0 24 5Z" />
-                                            <path fill="#fff" d="M26.572,29.036h4.917l0.772-4.995h-5.69v-2.73c0-2.075,0.678-3.915,2.619-3.915h3.119v-4.359c-0.548-0.074-1.707-0.236-3.897-0.236c-4.573,0-7.254,2.415-7.254,7.917v3.323h-4.701v4.995h4.701v11.729C22.089,42.905,23.032,43,24,43c0.875,0,1.729-0.08,2.572-0.194V29.036z" />
-                                        </svg>
-                                    </a>
-                                    <a href="#" target="_blank" aria-label="TikTok" className="tiktok">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-                                            <path fill="#000000" d="M24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,12.955,35.045,4,24,4z" />
-                                            <path fill="#FFFFFF" transform="translate(1, 3)" d="M33.3,16.8c-2.4-0.2-4.5-1.4-5.9-3.2v12.7c0,4.6-3.7,8.3-8.3,8.3s-8.3-3.7-8.3-8.3s3.7-8.3,8.3-8.3c0.5,0,1,0.1,1.5,0.2v4.3c-0.5-0.2-0.9-0.2-1.5-0.2c-2.3,0-4.2,1.9-4.2,4.2s1.9,4.2,4.2,4.2s4.2-1.9,4.2-4.2V6h4.2c0,3.3,2.1,6.1,5.1,7.4L33.3,16.8z" />
-                                        </svg>
-                                    </a>
-                                    <a href="#" target="_blank" aria-label="Telegram" className="telegram">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-                                            <path fill="#29b6f6" d="M24,4C12.954,4,4,12.954,4,24s8.954,20,20,20s20-8.954,20-20S35.046,4,24,4z"></path><path fill="#fff" d="M33.95,15.233l-4.584,21.232c-0.242,1.124-0.89,1.403-1.82,0.882l-6.523-4.833l-3.14,3.024 c-0.341,0.341-0.633,0.631-1.217,0.631l0.44-6.611l11.725-10.697c0.516-0.472-0.084-0.729-0.75-0.259L16.92,25.831l-6.37-1.998 c-1.116-0.348-1.125-1.114,0.209-1.653l21.928-8.545C33.261,13.482,34.314,13.9,33.95,15.233z"></path>
-                                        </svg>
-                                    </a>
+                    <div className="footer-grid" style={!isMobile ? { display: 'flex', justifyContent: 'space-between' } : {}}>
+                        {isMobile ? (
+                            <>
+                                <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', flex: '2' }}>
+                                    <div className="footer-col" style={{ flex: '1 1 200px' }}>
+                                        <h3>HBC Achar</h3>
+                                        <p style={{ color: 'white' }}>{t('footer_desc')}</p>
+                                    </div>
+                                    <div className="footer-col follow-us-col" style={{ flex: '1 1 150px' }}>
+                                        <h3>Follow Us</h3>
+                                        <div className="social-links">
+                                            <a href="https://www.facebook.com/groups/512382615075881/" target="_blank" aria-label="Facebook Group" className="facebook">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                                                    <path fill="#039be5" d="M24 5A19 19 0 1 0 24 43A19 19 0 1 0 24 5Z" />
+                                                    <path fill="#fff" d="M26.572,29.036h4.917l0.772-4.995h-5.69v-2.73c0-2.075,0.678-3.915,2.619-3.915h3.119v-4.359c-0.548-0.074-1.707-0.236-3.897-0.236c-4.573,0-7.254,2.415-7.254,7.917v3.323h-4.701v4.995h4.701v11.729C22.089,42.905,23.032,43,24,43c0.875,0,1.729-0.08,2.572-0.194V29.036z" />
+                                                </svg>
+                                            </a>
+                                            <a href="#" target="_blank" aria-label="TikTok" className="tiktok">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                                                    <path fill="#000000" d="M24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,12.955,35.045,4,24,4z" />
+                                                    <path fill="#FFFFFF" transform="translate(1, 3)" d="M33.3,16.8c-2.4-0.2-4.5-1.4-5.9-3.2v12.7c0,4.6-3.7,8.3-8.3,8.3s-8.3-3.7-8.3-8.3s3.7-8.3,8.3-8.3c0.5,0,1,0.1,1.5,0.2v4.3c-0.5-0.2-0.9-0.2-1.5-0.2c-2.3,0-4.2,1.9-4.2,4.2s1.9,4.2,4.2,4.2s4.2-1.9,4.2-4.2V6h4.2c0,3.3,2.1,6.1,5.1,7.4L33.3,16.8z" />
+                                                </svg>
+                                            </a>
+                                            <a href="#" target="_blank" aria-label="Telegram" className="telegram">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                                                    <path fill="#29b6f6" d="M24,4C12.954,4,4,12.954,4,24s8.954,20,20,20s20-8.954,20-20S35.046,4,24,4z"></path><path fill="#fff" d="M33.95,15.233l-4.584,21.232c-0.242,1.124-0.89,1.403-1.82,0.882l-6.523-4.833l-3.14,3.024 c-0.341,0.341-0.633,0.631-1.217,0.631l0.44-6.611l11.725-10.697c0.516-0.472-0.084-0.729-0.75-0.259L16.92,25.831l-6.37-1.998 c-1.116-0.348-1.125-1.114,0.209-1.653l21.928-8.545C33.261,13.482,34.314,13.9,33.95,15.233z"></path>
+                                                </svg>
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div className="footer-col">
-                            <h3>Quick Links</h3>
-                            <ul>
-                                <li><a href="#home">Home</a></li>
-                                <li><a href="#products">Products</a></li>
-                                <li><a href="#services">Services</a></li>
-                                <li><a href="#about">About Us</a></li>
-                                <li><a href="#contact">Contact</a></li>
-                            </ul>
-                        </div>
+                                <div className="footer-col">
+                                    <h3>Quick Links</h3>
+                                    <ul>
+                                        <li><a href="#home">Home</a></li>
+                                        <li><a href="#products">Products</a></li>
+                                        <li><a href="#services">Services</a></li>
+                                        <li><a href="#about">About Us</a></li>
+                                        <li><a href="#contact">Contact</a></li>
+                                    </ul>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <div className="footer-col" style={{ flex: '1' }}>
+                                    <h3>HBC Achar</h3>
+                                    <p style={{ color: 'white' }}>{t('footer_desc')}</p>
+                                </div>
+                                <div className="footer-col" style={{ flex: '1', textAlign: 'center' }}>
+                                    <h3>Quick Links</h3>
+                                    <ul style={{ display: 'inline-block', textAlign: 'left' }}>
+                                        <li><a href="#home">Home</a></li>
+                                        <li><a href="#products">Products</a></li>
+                                        <li><a href="#services">Services</a></li>
+                                        <li><a href="#about">About Us</a></li>
+                                        <li><a href="#contact">Contact</a></li>
+                                    </ul>
+                                </div>
+                                <div className="footer-col follow-us-col" style={{ flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                                        <h3>Follow Us</h3>
+                                        <div className="social-links">
+                                            <a href="https://www.facebook.com/groups/512382615075881/" target="_blank" aria-label="Facebook Group" className="facebook">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                                                    <path fill="#039be5" d="M24 5A19 19 0 1 0 24 43A19 19 0 1 0 24 5Z" />
+                                                    <path fill="#fff" d="M26.572,29.036h4.917l0.772-4.995h-5.69v-2.73c0-2.075,0.678-3.915,2.619-3.915h3.119v-4.359c-0.548-0.074-1.707-0.236-3.897-0.236c-4.573,0-7.254,2.415-7.254,7.917v3.323h-4.701v4.995h4.701v11.729C22.089,42.905,23.032,43,24,43c0.875,0,1.729-0.08,2.572-0.194V29.036z" />
+                                                </svg>
+                                            </a>
+                                            <a href="#" target="_blank" aria-label="TikTok" className="tiktok">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                                                    <path fill="#000000" d="M24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,12.955,35.045,4,24,4z" />
+                                                    <path fill="#FFFFFF" transform="translate(1, 3)" d="M33.3,16.8c-2.4-0.2-4.5-1.4-5.9-3.2v12.7c0,4.6-3.7,8.3-8.3,8.3s-8.3-3.7-8.3-8.3s3.7-8.3,8.3-8.3c0.5,0,1,0.1,1.5,0.2v4.3c-0.5-0.2-0.9-0.2-1.5-0.2c-2.3,0-4.2,1.9-4.2,4.2s1.9,4.2,4.2,4.2s4.2-1.9,4.2-4.2V6h4.2c0,3.3,2.1,6.1,5.1,7.4L33.3,16.8z" />
+                                                </svg>
+                                            </a>
+                                            <a href="#" target="_blank" aria-label="Telegram" className="telegram">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                                                    <path fill="#29b6f6" d="M24,4C12.954,4,4,12.954,4,24s8.954,20,20,20s20-8.954,20-20S35.046,4,24,4z"></path><path fill="#fff" d="M33.95,15.233l-4.584,21.232c-0.242,1.124-0.89,1.403-1.82,0.882l-6.523-4.833l-3.14,3.024 c-0.341,0.341-0.633,0.631-1.217,0.631l0.44-6.611l11.725-10.697c0.516-0.472-0.084-0.729-0.75-0.259L16.92,25.831l-6.37-1.998 c-1.116-0.348-1.125-1.114,0.209-1.653l21.928-8.545C33.261,13.482,34.314,13.9,33.95,15.233z"></path>
+                                                </svg>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
                     </div>
                     <div className="copyright">
                         &copy; 2026 HBC Achar Shop. All rights reserved.
@@ -1568,6 +1643,68 @@ function App() {
                     <div className="toast">{toast}</div>
                 </div>
             )}
+
+            {/* Mobile Bottom Sticky Navigation */}
+            <div className="mobile-bottom-nav" style={{
+                position: 'fixed',
+                bottom: 0,
+                left: 0,
+                width: '100%',
+                backgroundColor: 'var(--header-bg)',
+                boxShadow: '0 -2px 10px rgba(0,0,0,0.1)',
+                justifyContent: 'space-around',
+                alignItems: 'center',
+                padding: '10px 0',
+                zIndex: 1000,
+                borderTop: '1px solid rgba(255,255,255,0.1)',
+                height: '60px'
+            }}>
+                {/* User */}
+                <button style={{ background: 'none', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', color: '#fff' }}>
+                    <img src={userIcon} alt="User" style={{ width: '20px', height: '20px', filter: 'brightness(0) invert(1)' }} />
+                    <span style={{ fontSize: '10px' }}>User</span>
+                </button>
+
+                {/* Cart */}
+                <button onClick={() => setIsCartOpen(true)} style={{ background: 'none', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', position: 'relative', color: '#fff' }}>
+                    <div style={{ position: 'relative' }}>
+                        <img src={shoppingBagIcon} alt="Cart" style={{ width: '24px', height: '24px', filter: 'brightness(0) invert(1)' }} />
+                        <span style={{
+                            position: 'absolute',
+                            top: '-5px',
+                            right: '-8px',
+                            background: 'var(--secondary-orange)',
+                            color: 'white',
+                            borderRadius: '50%',
+                            width: '16px',
+                            height: '16px',
+                            fontSize: '10px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}>{totalQty}</span>
+                    </div>
+                    <span style={{ fontSize: '10px' }}>Cart</span>
+                </button>
+
+                {/* Track Order */}
+                <button onClick={() => alert(lang === 'bn' ? 'অর্ডার ট্র্যাক শীঘ্রই আসছে!' : 'Track Order coming soon!')} style={{ background: 'none', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', color: '#fff' }}>
+                    <i className="fas fa-truck" style={{ fontSize: '18px' }}></i>
+                    <span style={{ fontSize: '10px' }}>Track</span>
+                </button>
+
+                {/* Language */}
+                <button onClick={() => setLang(prev => prev === 'en' ? 'bn' : 'en')} style={{ background: 'none', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', color: '#fff' }}>
+                    <i className="fas fa-globe" style={{ fontSize: '18px' }}></i>
+                    <span style={{ fontSize: '10px' }}>{lang === 'en' ? 'BN' : 'EN'}</span>
+                </button>
+
+                {/* Theme */}
+                <button onClick={toggleTheme} style={{ background: 'none', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', color: '#fff' }}>
+                    {theme === 'light' ? <i className="fas fa-moon" style={{ fontSize: '18px' }}></i> : <i className="fas fa-sun" style={{ fontSize: '18px' }}></i>}
+                    <span style={{ fontSize: '10px' }}>Theme</span>
+                </button>
+            </div>
 
             {/* Floating WhatsApp Button */}
             <DraggableWhatsAppButton />
