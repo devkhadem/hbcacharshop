@@ -4,7 +4,7 @@ import logo from './assets/images/hbclogo.png';
 import shoppingBagIcon from './assets/images/shopping-cart.svg';
 import userIcon from './assets/images/user-circle.svg';
 // import coverImage from './assets/images/cover.jpg';
-const coverImage = "https://picsum.photos/seed/cover/800/400";
+import aboutImage from './assets/images/about.jpeg';
 import footerImage from './assets/images/footerimage.jpeg';
 
 // --- Slider Images ---
@@ -206,7 +206,7 @@ const translations = {
 };
 
 // --- ডামি প্রোডাক্ট ডেটা ---
-const products = [
+const initialProducts = [
     // Mango Series
     {
         id: 1,
@@ -339,7 +339,7 @@ const slides = [
     { img: slide6, alt: "Slide 6" }
 ];
 
-const reviews = [
+const initialReviews = [
     {
         id: 1,
         name: "Rahim Ahmed",
@@ -518,7 +518,30 @@ const DraggableWhatsAppButton = () => {
 
 function App() {
     const [lang, setLang] = useState('en');
+    // Load data from LocalStorage or use initial data
+    const [products, setProducts] = useState(initialProducts);
+
+    // Fetch Products from Backend API
+    useEffect(() => {
+        fetch('http://localhost:5000/api/products')
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data) && data.length > 0) {
+                    setProducts(data);
+                }
+            })
+            .catch(err => console.log("Backend not connected, using static data"));
+    }, []);
+
+    const [reviews, setReviews] = useState(() => {
+        const saved = localStorage.getItem('hbc_reviews');
+        return saved ? JSON.parse(saved) : initialReviews;
+    });
     const [cart, setCart] = useState([]);
+    const [orders, setOrders] = useState(() => {
+        const saved = localStorage.getItem('hbc_orders');
+        return saved ? JSON.parse(saved) : [];
+    });
     const [filter, setFilter] = useState('all');
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
@@ -536,12 +559,27 @@ function App() {
     const [activeSection, setActiveSection] = useState('home');
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
+    // Admin State
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [adminTab, setAdminTab] = useState('products'); // products, orders, reviews
+    const [adminLoginData, setAdminLoginData] = useState({ username: '', password: '' });
+    const [newProduct, setNewProduct] = useState({
+        name: '', category: 'mixed', price: '', originalPrice: '', image: ''
+    });
+    const [isTranslating, setIsTranslating] = useState(false);
+
     // Handle window resize for mobile detection
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth < 768);
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    // Save data to LocalStorage whenever it changes
+    useEffect(() => {
+        localStorage.setItem('hbc_reviews', JSON.stringify(reviews));
+        localStorage.setItem('hbc_orders', JSON.stringify(orders));
+    }, [reviews, orders]);
 
     // Body Scroll Lock when Menu is Open
     useEffect(() => {
@@ -576,6 +614,24 @@ function App() {
         return key;
     };
 
+    // Auto Translate Function (Bengali to English)
+    const translateText = async (text) => {
+        if (!text) return "";
+        try {
+            // Add timeout to prevent hanging
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+            const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=bn&tl=en&dt=t&q=${encodeURIComponent(text)}`;
+            const res = await fetch(url, { signal: controller.signal });
+            clearTimeout(timeoutId);
+            const data = await res.json();
+            return data[0].map(x => x[0]).join('');
+        } catch (error) {
+            console.error("Translation failed:", error);
+            return text;
+        }
+    };
+
     // Helper function to convert numbers to Bengali
     const toBengaliNumber = (num) => {
         const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
@@ -583,9 +639,14 @@ function App() {
     };
 
     // Helper function to format price
-    const formatPrice = (price) => {
+    const formatPrice = (price, crossed = false) => {
         const number = lang === 'bn' ? toBengaliNumber(price) : price;
-        return `৳ ${number}`;
+        return (
+            <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: '2px', textDecoration: crossed ? 'line-through' : 'none' }}>
+                <span style={{ verticalAlign: 'baseline', fontSize: 'inherit', lineHeight: '1' }}>&#2547;</span>
+                <span style={{ verticalAlign: 'baseline', lineHeight: '1' }}>{number}</span>
+            </span>
+        );
     };
 
     // WhatsApp Inquiry Logic
@@ -736,6 +797,19 @@ function App() {
             note: `Payment: ${paymentMethod}. Items: ${cart.map(i => `${i.name.en} x${i.qty}`).join(', ')}`
         };
 
+        // Save Order to State (For Admin Dashboard)
+        const newOrder = {
+            id: Date.now(),
+            customer: formData.get('name'),
+            phone: formData.get('phone'),
+            address: `${addressDetails}, ${upazila}, ${district}`,
+            items: cart,
+            total: totalPrice,
+            status: 'Pending',
+            date: new Date().toLocaleString()
+        };
+        setOrders([newOrder, ...orders]);
+
         // TODO: Replace with your actual Steadfast API keys
         const API_KEY = "YOUR_API_KEY";
         const SECRET_KEY = "YOUR_SECRET_KEY";
@@ -837,8 +911,217 @@ function App() {
         setQuantityModal({ open: false, product: null });
     };
 
+    // Admin Functions
+    const handleAdminLogin = (e) => {
+        e.preventDefault();
+        if (adminLoginData.username === 'admin' && adminLoginData.password === '1234') {
+            setIsAdmin(true);
+            showToast("Welcome Admin!");
+        } else {
+            alert("Invalid Username or Password");
+        }
+    };
+
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setNewProduct({ ...newProduct, image: reader.result });
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleAddProduct = async (e) => {
+        e.preventDefault();
+        setIsTranslating(true);
+        const nameEn = await translateText(newProduct.name);
+
+        const formData = new FormData();
+        formData.append('nameBn', newProduct.name);
+        formData.append('nameEn', nameEn);
+        formData.append('category', newProduct.category);
+        formData.append('price', newProduct.price);
+        formData.append('originalPrice', newProduct.originalPrice);
+
+        const fileInput = document.getElementById('product-image-input');
+        if (fileInput && fileInput.files[0]) {
+            formData.append('image', fileInput.files[0]);
+        }
+
+        try {
+            const response = await fetch('http://localhost:5000/api/products', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                const savedProduct = await response.json();
+                setProducts(prev => [savedProduct, ...prev]);
+                showToast("Product Added Successfully!");
+                setNewProduct({ name: '', category: 'mixed', price: '', originalPrice: '', image: '' });
+                if (fileInput) fileInput.value = '';
+            } else {
+                showToast("Failed to add product to server");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            showToast("Error connecting to server");
+            showToast("Server Error: Product NOT added");
+        }
+
+        setIsTranslating(false);
+    };
+
+    const updateOrderStatus = (orderId, status) => {
+        setOrders(orders.map(o => o.id === orderId ? { ...o, status } : o));
+        showToast("Order Status Updated!");
+    };
+
+    const deleteReview = (reviewId) => {
+        if (window.confirm("Are you sure you want to delete this review?")) {
+            setReviews(reviews.filter(r => r.id !== reviewId));
+            showToast("Review Deleted!");
+        }
+    };
+
     return (
         <div className="App" id="top">
+            <style>{`
+                html, body {
+                    overflow-x: hidden !important;
+                    max-width: 100% !important;
+                    width: 100% !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    position: relative;
+                    touch-action: pan-y;
+                }
+                #root, .App {
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    overflow-x: hidden !important;
+                    position: relative;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                }
+                * {
+                    box-sizing: border-box;
+                }
+                img {
+                    max-width: 100%;
+                    height: auto;
+                }
+                @media (max-width: 768px) {
+                    .container {
+                        width: 100% !important;
+                        max-width: 100% !important;
+                        padding-left: 15px !important;
+                        padding-right: 15px !important;
+                        overflow-x: hidden !important;
+                        box-sizing: border-box !important;
+                    }
+                    section {
+                        overflow-x: hidden !important;
+                        width: 100% !important;
+                    }
+                    .contact-grid {
+                        display: flex !important;
+                        flex-direction: column !important;
+                        width: 100% !important;
+                        margin: 0 !important;
+                        box-sizing: border-box !important;
+                    }
+                    .contact-info-card, .contact-form-card {
+                        width: 100% !important;
+                        max-width: 100% !important;
+                        margin-bottom: 20px !important;
+                        margin: 0 0 20px 0 !important;
+                        padding: 20px !important;
+                        box-sizing: border-box !important;
+                    }
+                    input, textarea, select {
+                        max-width: 100% !important;
+                        width: 100% !important;
+                        box-sizing: border-box !important;
+                    }
+                    .products-grid {
+                        display: grid !important;
+                        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                        gap: 25px 15px !important;
+                        width: 100% !important;
+                        padding: 0 !important;
+                    }
+                    .product-card {
+                        width: 100% !important;
+                        margin: 0 !important;
+                    }
+                    .product-card .price {
+                        font-size: 14px !important;
+                        font-size: 18px !important;
+                    }
+                    .product-card .product-footer > div:first-child {
+                        gap: 4px !important;
+                        flex-wrap: wrap !important;
+                        justify-content: center !important;
+                    }
+                    .price-row-container {
+                        flex-direction: column !important;
+                        gap: 5px !important;
+                    }
+                    .buttons-wrapper {
+                        gap: 15px !important;
+                    }
+                    .prices-wrapper span:first-child {
+                        color: rgba(255, 255, 255, 0.7) !important;
+                    }
+                    .prices-wrapper span:first-child > span {
+                        text-decoration-color: black !important;
+                        -webkit-text-decoration-color: black !important;
+                    }
+                    .product-card .add-btn, .product-card .whatsapp-btn-card {
+                        width: 28px !important;
+                        height: 28px !important;
+                        font-size: 10px !important;
+                        width: 35px !important;
+                        height: 35px !important;
+                        font-size: 16px !important;
+                        width: 40px !important;
+                        height: 40px !important;
+                        font-size: 20px !important;
+                        padding: 0 !important;
+                    }
+                }
+                .product-card .submit-btn {
+                    background-color: #FF5722 !important;
+                    color: white !important;
+                    background-color: #D4AF37 !important;
+                    color: #000 !important;
+                    border: none !important;
+                    background-image: none !important;
+                }
+                .product-card .submit-btn:hover {
+                    background-color: #E64A19 !important;
+                    background-color: #B59021 !important;
+                    background-image: none !important;
+                }
+                @media (min-width: 769px) {
+                    header {
+                        position: sticky !important;
+                        position: fixed !important;
+                        top: 0 !important;
+                        left: 0 !important;
+                        width: 100% !important;
+                        z-index: 1000 !important;
+                        background-color: var(--header-bg, #232f3e) !important;
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
+                    }
+                    .App {
+                        padding-top: 90px !important;
+                    }
+                }
+            `}</style>
             {isMenuOpen && <div className="overlay" onClick={() => setIsMenuOpen(false)} style={{ zIndex: 998 }}></div>}
 
             {/* Header */}
@@ -939,13 +1222,13 @@ function App() {
                                 Pickles
                             </a>
                             <a href="#services" onClick={(e) => handleNavClick(e, 'services')} style={{ textDecoration: 'none', color: activeSection === 'services' ? 'var(--secondary-orange)' : '#fff', fontWeight: '500', padding: '5px 0' }}>
-                                {t('services')}
+                                Services
                             </a>
                             <a href="#about" onClick={(e) => handleNavClick(e, 'about')} style={{ textDecoration: 'none', color: activeSection === 'about' ? 'var(--secondary-orange)' : '#fff', fontWeight: '500', padding: '5px 0' }}>
-                                {t('about_title')}
+                                About
                             </a>
                             <a href="#contact" onClick={(e) => handleNavClick(e, 'contact')} style={{ textDecoration: 'none', color: activeSection === 'contact' ? 'var(--secondary-orange)' : '#fff', fontWeight: '500', padding: '5px 0' }}>
-                                {t('contact_title')}
+                                Contact
                             </a>
                         </nav>
                     )}
@@ -1014,13 +1297,13 @@ function App() {
                         <i className="fas fa-shopping-basket" style={{ width: '25px', color: 'var(--secondary-orange)' }}></i> Pickles
                     </a>
                     <a href="#services" onClick={(e) => handleNavClick(e, 'services')} style={{ textDecoration: 'none', color: activeSection === 'services' ? 'var(--secondary-orange)' : '#fff', fontWeight: 'bold', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <i className="fas fa-concierge-bell" style={{ width: '25px', color: 'var(--secondary-orange)' }}></i> {t('services')}
+                        <i className="fas fa-concierge-bell" style={{ width: '25px', color: 'var(--secondary-orange)' }}></i> Services
                     </a>
                     <a href="#about" onClick={(e) => handleNavClick(e, 'about')} style={{ textDecoration: 'none', color: activeSection === 'about' ? 'var(--secondary-orange)' : '#fff', fontWeight: 'bold', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <i className="fas fa-info-circle" style={{ width: '25px', color: 'var(--secondary-orange)' }}></i> {t('about_title')}
+                        <i className="fas fa-info-circle" style={{ width: '25px', color: 'var(--secondary-orange)' }}></i> About
                     </a>
                     <a href="#contact" onClick={(e) => handleNavClick(e, 'contact')} style={{ textDecoration: 'none', color: activeSection === 'contact' ? 'var(--secondary-orange)' : '#fff', fontWeight: 'bold', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <i className="fas fa-envelope" style={{ width: '25px', color: 'var(--secondary-orange)' }}></i> {t('contact_title')}
+                        <i className="fas fa-envelope" style={{ width: '25px', color: 'var(--secondary-orange)' }}></i> Contact
                     </a>
                 </nav>
             </div>
@@ -1102,7 +1385,7 @@ function App() {
                                     }}>
                                         {lang === 'bn' ? 'ফ্ল্যাশ সেল' : 'FLASH SALE'}
                                     </div>
-                                    <div className="product-img" style={{ aspectRatio: '1 / 1', width: '100%' }}>
+                                    <div className="product-img" style={{ aspectRatio: '1 / 1', width: '100%', overflow: 'hidden' }}>
                                         <img src={product.image} alt={product.name[lang]} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                     </div>
                                     <div className="product-info" style={{ textAlign: 'center' }}>
@@ -1120,7 +1403,7 @@ function App() {
                                                 <button className="add-btn" onClick={() => openQuantityModal(product)} title={t('add_to_cart')}>
                                                     <i className="fas fa-cart-plus"></i>
                                                 </button>
-                                                <button className="buy-now-btn" onClick={() => { addToCart(product); setIsCartOpen(true); setIsCheckoutOpen(true); }}>{t('buy_now')}</button>
+                                                <button className="submit-btn" onClick={() => { addToCart(product); setIsCartOpen(true); setIsCheckoutOpen(true); }}>{t('buy_now')}</button>
                                                 <button className="whatsapp-btn-card" onClick={() => handleWhatsAppInquiry(product)} title={lang === 'bn' ? "হোয়াটসঅ্যাপে অর্ডার করুন" : "Order on WhatsApp"}>
                                                     <i className="fab fa-whatsapp"></i>
                                                 </button>
@@ -1165,6 +1448,184 @@ function App() {
                 </section>
             )}
 
+            {/* Admin Dashboard Section */}
+            {currentPage === 'admin' && (
+                <section id="admin-dashboard" style={{ padding: '100px 0', minHeight: '80vh', background: '#f4f4f4' }}>
+                    <div className="container">
+                        {!isAdmin ? (
+                            <div style={{ maxWidth: '400px', margin: '0 auto', background: 'white', padding: '30px', borderRadius: '10px', boxShadow: '0 5px 15px rgba(0,0,0,0.1)' }}>
+                                <h2 style={{ textAlign: 'center', marginBottom: '20px', color: 'var(--secondary-color)' }}>Admin Login</h2>
+                                <form onSubmit={handleAdminLogin}>
+                                    <div className="form-group">
+                                        <label>Username</label>
+                                        <input type="text" value={adminLoginData.username} onChange={(e) => setAdminLoginData({ ...adminLoginData, username: e.target.value })} required />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Password</label>
+                                        <input type="password" value={adminLoginData.password} onChange={(e) => setAdminLoginData({ ...adminLoginData, password: e.target.value })} required />
+                                    </div>
+                                    <button type="submit" className="submit-btn">Login</button>
+                                    <p style={{ marginTop: '15px', fontSize: '0.9rem', color: '#666', textAlign: 'center' }}>
+                                        (Demo Credentials: <strong>admin</strong> / <strong>1234</strong>)
+                                    </p>
+                                </form>
+                            </div>
+                        ) : (
+                            <div className="admin-panel">
+                                <div className="admin-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+                                    <h2>Admin Dashboard</h2>
+                                    <button onClick={() => setIsAdmin(false)} style={{ background: '#ff4444', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '5px', cursor: 'pointer' }}>Logout</button>
+                                </div>
+
+                                <div className="admin-tabs" style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+                                    {['products', 'orders', 'reviews'].map(tab => (
+                                        <button
+                                            key={tab}
+                                            onClick={() => setAdminTab(tab)}
+                                            style={{
+                                                padding: '10px 20px',
+                                                background: adminTab === tab ? 'var(--secondary-orange)' : 'white',
+                                                color: adminTab === tab ? 'white' : 'black',
+                                                border: 'none',
+                                                borderRadius: '5px',
+                                                cursor: 'pointer',
+                                                textTransform: 'capitalize',
+                                                fontWeight: 'bold'
+                                            }}
+                                        >
+                                            {tab}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                <div className="admin-content" style={{ background: 'white', padding: '20px', borderRadius: '10px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
+                                    {adminTab === 'products' && (
+                                        <div>
+                                            <h3 style={{ marginBottom: '20px' }}>Add New Product</h3>
+                                            <form onSubmit={handleAddProduct} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                                                <div className="form-group">
+                                                    <label>Product Name (Bengali)</label>
+                                                    <input type="text" value={newProduct.name} onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })} placeholder="পণ্যের নাম লিখুন" required />
+                                                </div>
+                                                <div className="form-group">
+                                                    <label>Category</label>
+                                                    <select value={newProduct.category} onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}>
+                                                        <option value="mixed">Mixed</option>
+                                                        <option value="tok">Sour</option>
+                                                        <option value="mishti">Sweet</option>
+                                                        <option value="jhal">Spicy</option>
+                                                    </select>
+                                                </div>
+                                                <div className="form-group">
+                                                    <label>Regular Price</label>
+                                                    <input type="number" value={newProduct.originalPrice} onChange={(e) => setNewProduct({ ...newProduct, originalPrice: e.target.value })} placeholder="রেগুলার প্রাইস" required />
+                                                </div>
+                                                <div className="form-group">
+                                                    <label>Discount Price</label>
+                                                    <input type="number" value={newProduct.price} onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })} placeholder="ডিসকাউন্ট প্রাইস" required />
+                                                </div>
+                                                <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                                                    <label>Product Image</label>
+                                                    <input
+                                                        id="product-image-input"
+                                                        type="file"
+                                                        accept="image/*"
+                                                        onChange={handleImageUpload}
+                                                        style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '4px', width: '100%', background: '#f9f9f9' }}
+                                                    />
+                                                    {newProduct.image && <img src={newProduct.image} alt="Preview" style={{ height: '80px', marginTop: '10px', borderRadius: '5px', border: '1px solid #ddd', objectFit: 'contain', backgroundColor: '#fff' }} />}
+                                                </div>
+                                                <button type="submit" className="submit-btn" disabled={isTranslating} style={{ gridColumn: '1 / -1' }}>
+                                                    {isTranslating ? 'Translating & Adding...' : 'Add Product'}
+                                                </button>
+                                            </form>
+                                            <hr style={{ margin: '30px 0' }} />
+                                            <h3>Product List ({products.length})</h3>
+                                            <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                                                <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '10px' }}>
+                                                    <thead>
+                                                        <tr style={{ background: '#f9f9f9', textAlign: 'left' }}>
+                                                            <th style={{ padding: '10px' }}>Name</th>
+                                                            <th style={{ padding: '10px' }}>Price</th>
+                                                            <th style={{ padding: '10px' }}>Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {products.map(p => (
+                                                            <tr key={p.id} style={{ borderBottom: '1px solid #eee' }}>
+                                                                <td style={{ padding: '10px' }}>{p.name.bn}</td>
+                                                                <td style={{ padding: '10px' }}>{p.price}</td>
+                                                                <td style={{ padding: '10px' }}>
+                                                                    <button onClick={() => setProducts(products.filter(x => x.id !== p.id))} style={{ color: 'red', background: 'none', border: 'none', cursor: 'pointer' }}>Delete</button>
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {adminTab === 'orders' && (
+                                        <div>
+                                            <h3>Orders ({orders.length})</h3>
+                                            {orders.length === 0 ? <p>No orders yet.</p> : (
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '15px' }}>
+                                                    {orders.map(order => (
+                                                        <div key={order.id} style={{ border: '1px solid #ddd', padding: '15px', borderRadius: '5px' }}>
+                                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                                                                <strong>Order #{order.id}</strong>
+                                                                <span style={{ fontSize: '0.9rem', color: '#666' }}>{order.date}</span>
+                                                            </div>
+                                                            <p><strong>Customer:</strong> {order.customer} ({order.phone})</p>
+                                                            <p><strong>Address:</strong> {order.address}</p>
+                                                            <p><strong>Items:</strong> {order.items.map(i => `${i.name.en} x${i.qty}`).join(', ')}</p>
+                                                            <p><strong>Total:</strong> {formatPrice(order.total)}</p>
+                                                            <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                                <label>Status:</label>
+                                                                <select
+                                                                    value={order.status}
+                                                                    onChange={(e) => updateOrderStatus(order.id, e.target.value)}
+                                                                    style={{ padding: '5px', borderRadius: '4px', border: '1px solid #ccc' }}
+                                                                >
+                                                                    <option value="Pending">Pending</option>
+                                                                    <option value="Processing">Processing</option>
+                                                                    <option value="Shipped">Shipped</option>
+                                                                    <option value="Delivered">Delivered</option>
+                                                                    <option value="Cancelled">Cancelled</option>
+                                                                </select>
+                                                                <span style={{ padding: '2px 8px', borderRadius: '10px', background: order.status === 'Delivered' ? '#d4edda' : '#fff3cd', color: order.status === 'Delivered' ? '#155724' : '#856404', fontSize: '0.8rem' }}>{order.status}</span>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {adminTab === 'reviews' && (
+                                        <div>
+                                            <h3>Customer Reviews ({reviews.length})</h3>
+                                            <div style={{ display: 'grid', gap: '15px', marginTop: '15px' }}>
+                                                {reviews.map(review => (
+                                                    <div key={review.id} style={{ border: '1px solid #eee', padding: '15px', borderRadius: '5px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                        <div>
+                                                            <strong>{review.name}</strong> <span style={{ color: '#f39c12' }}>★ {review.rating}</span>
+                                                            <p style={{ fontSize: '0.9rem', color: '#555', marginTop: '5px' }}>{review.comment.bn}</p>
+                                                        </div>
+                                                        <button onClick={() => deleteReview(review.id)} style={{ background: '#ff4444', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '3px', cursor: 'pointer' }}>Delete</button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </section>
+            )}
+
             {currentPage === 'home' && (
                 <main>
                     {/* Products Section */}
@@ -1189,23 +1650,32 @@ function App() {
                             <div className="products-grid">
                                 {filteredProducts.map(product => (
                                     <div className="product-card" key={product.id} style={{ position: 'relative' }}>
-                                        <div className="product-img" style={{ aspectRatio: '1 / 1', width: '100%' }}>
+                                        <div className="product-img" style={{ aspectRatio: '1 / 1', width: '100%', overflow: 'hidden' }}>
                                             <img src={product.image} alt={product.name[lang]} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                         </div>
                                         <div className="product-info" style={{ textAlign: 'center' }}>
                                             <h3 className="product-title">{product.name[lang]}</h3>
-                                            <div className="product-footer" style={{ flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%' }}>
-                                                    <span className="price">{formatPrice(product.price)}</span>
-                                                    <button className="add-btn" onClick={() => openQuantityModal(product)} title={t('add_to_cart')}>
-                                                        <i className="fas fa-cart-plus"></i>
-                                                    </button>
-                                                    <button className="whatsapp-btn-card" onClick={() => handleWhatsAppInquiry(product)} title={lang === 'bn' ? "হোয়াটসঅ্যাপে অর্ডার করুন" : "Order on WhatsApp"}>
-                                                        <i className="fab fa-whatsapp"></i>
-                                                    </button>
+                                            <div className="product-footer" style={{ flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+                                                <div className="price-row-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%', padding: '0 5px' }}>
+                                                    <div className="prices-wrapper" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                                        <span style={{ color: 'rgba(0,0,0,0.6)', fontSize: '0.9rem' }}>
+                                                            {formatPrice(product.originalPrice, true)}
+                                                        </span>
+                                                        <span className="price" style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--text-color)' }}>
+                                                            {formatPrice(product.price)}
+                                                        </span>
+                                                    </div>
+                                                    <div className="buttons-wrapper" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                                        <button className="add-btn" onClick={() => openQuantityModal(product)} title={t('add_to_cart')} style={{ background: 'white', color: 'black' }}>
+                                                            <i className="fas fa-cart-plus"></i>
+                                                        </button>
+                                                        <button className="whatsapp-btn-card" onClick={() => handleWhatsAppInquiry(product)} title={lang === 'bn' ? "হোয়াটসঅ্যাপে অর্ডার করুন" : "Order on WhatsApp"} style={{ background: 'white', color: '#25D366' }}>
+                                                            <i className="fab fa-whatsapp"></i>
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                                <div className="product-actions">
-                                                    <button className="buy-now-btn" onClick={() => { addToCart(product); setIsCartOpen(true); setIsCheckoutOpen(true); }}>{t('buy_now')}</button>
+                                                <div className="product-actions" style={{ width: '100%' }}>
+                                                    <button className="submit-btn" onClick={() => { addToCart(product); setIsCartOpen(true); setIsCheckoutOpen(true); }}>{t('buy_now')}</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -1253,7 +1723,7 @@ function App() {
                         </div>
                         <div className="reviews-grid">
                             <div className="reviews-scroll">
-                                {reviews.concat(reviews).map((review, index) => (
+                                {reviews.map((review, index) => (
                                     <div className="review-card" key={`${review.id}-${index}`}>
                                         <div className="review-header">
                                             <img src={review.avatar} alt={review.name} />
@@ -1277,7 +1747,7 @@ function App() {
                     <section id="services" className="services-section">
                         <div className="container">
                             <div className="section-header">
-                                <h2 className="section-title">{t('services')}</h2>
+                                <h2 className="section-title">Our Services</h2>
                             </div>
                             <div className="service-features">
                                 {[
@@ -1300,11 +1770,11 @@ function App() {
                     <section id="about" className="about-section">
                         <div className="container">
                             <div className="section-header">
-                                <h2 className="section-title">{t('about_title')}</h2>
+                                <h2 className="section-title">About Us</h2>
                             </div>
                             <div className="about-card">
                                 <div className="about-image-wrapper">
-                                    <img src={coverImage} alt="HBC Achar Shop Banner" />
+                                    <img src={aboutImage} alt="HBC Achar Shop Banner" />
                                 </div>
                                 <div className="about-content">
                                     <p className="about-intro">{t('about_text')}</p>
@@ -1336,7 +1806,7 @@ function App() {
                     <section id="contact" className="contact-section">
                         <div className="container">
                             <div className="section-header">
-                                <h2 className="section-title">{t('contact_title')}</h2>
+                                <h2 className="section-title">Contact Us</h2>
                             </div>
                             <div className="contact-grid">
                                 <div className="contact-info-card">
@@ -1440,6 +1910,7 @@ function App() {
                                         <li><a href="#services">Services</a></li>
                                         <li><a href="#about">About Us</a></li>
                                         <li><a href="#contact">Contact</a></li>
+                                        <li><a href="#" onClick={(e) => { e.preventDefault(); setCurrentPage('admin'); window.scrollTo(0, 0); }}>Admin Login</a></li>
                                     </ul>
                                 </div>
                             </>
@@ -1457,6 +1928,7 @@ function App() {
                                         <li><a href="#services">Services</a></li>
                                         <li><a href="#about">About Us</a></li>
                                         <li><a href="#contact">Contact</a></li>
+                                        <li><a href="#" onClick={(e) => { e.preventDefault(); setCurrentPage('admin'); window.scrollTo(0, 0); }}>Admin Login</a></li>
                                     </ul>
                                 </div>
                                 <div className="footer-col follow-us-col" style={{ flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
